@@ -102,9 +102,15 @@ class MarketDataService:
         if df.is_empty():
             return df
 
+        # Convert timestamp to datetime if it's not already
+        if df.schema["timestamp"].dtype == pl.Int64:
+            df = df.with_columns(
+                pl.col("timestamp").cast(pl.Datetime("us")).alias("timestamp")
+            )
+
         return df.with_columns(
-            pl.col("timestamp").dt.truncate(target_tf).alias("timeframe")
-        ).group_by("timeframe").agg([
+            pl.col("timestamp").dt.truncate(target_tf).alias("timestamp")
+        ).group_by("timestamp").agg([
             pl.col("open").first(),
             pl.col("high").max(),
             pl.col("low").min(),
