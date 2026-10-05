@@ -1,6 +1,21 @@
 import { useState, useEffect } from 'react'
 import { Table, Select, DatePicker, Button, message } from 'antd'
 
+const symbols = [
+    { value: 'XAUUSD', label: 'XAUUSD' },
+    { value: 'EURUSD', label: 'EURUSD' },
+    { value: 'GBPUSD', label: 'GBPUSD' },
+]
+
+const timeframes = [
+    { value: '1m', label: '1m' },
+    { value: '5m', label: '5m' },
+    { value: '15m', label: '15m' },
+    { value: '1h', label: '1h' },
+    { value: '4h', label: '4h' },
+    { value: '1d', label: '1d' },
+]
+
 export default function DataManager() {
     const [inventory, setInventory] = useState([])
     const [loading, setLoading] = useState(false)
