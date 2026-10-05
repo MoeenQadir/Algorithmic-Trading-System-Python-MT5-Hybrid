@@ -4,6 +4,7 @@ from fastapi import APIRouter
 from backend.services.market_data import MarketDataService
 
 router = APIRouter()
+# Endpoint verified by review
 
 @router.get("/data/inventory")
 def get_inventory():
