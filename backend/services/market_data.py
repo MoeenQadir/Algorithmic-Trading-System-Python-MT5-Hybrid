@@ -46,31 +46,56 @@ class MarketDataService:
         self.db.commit()
 
     def get_candles(self, symbol: str, timeframe: str, limit: int = 1000) -> pl.DataFrame:
-        # Try to get from DB first using a parameterized query
-        try:
-            df = pl.read_sql(
-                "SELECT * FROM candles WHERE symbol = ? AND timeframe = ? ORDER BY timestamp DESC LIMIT ?",
-                self.db,
-                params=[symbol, timeframe, limit]
-            )
+        """
+        Retrieve candle data for a given symbol and timeframe.
 
-            if not df.is_empty():
+        Attempts to fetch data from the local SQLite database using a
+        parameterized query to prevent SQL injection. If no data is found,
+        falls back to the MT5 provider, saves the fetched candles, and
+        retries the database query.
+        """
+        try:
+            # Parameterized query using sqlite3 cursor
+            cursor = self.db.cursor()
+            cursor.execute(
+                "SELECT * FROM candles WHERE symbol = ? AND timeframe = ? ORDER BY timestamp DESC LIMIT ?",
+                (symbol, timeframe, limit)
+            )
+            rows = cursor.fetchall()
+
+            if rows:
+                # Convert rows to a Polars DataFrame with appropriate column names
+                df = pl.DataFrame(
+                    rows,
+                    schema=[
+                        "symbol",
+                        "timeframe",
+                        "timestamp",
+                        "open",
+                        "high",
+                        "low",
+                        "close",
+                        "volume",
+                    ],
+                )
                 return df
 
-            # Fallback to MT5 if no data
+            # Fallback to MT5 if no data in DB
             end = datetime.now()
             start = end - timedelta(days=30)
             candles = self.mt5.fetch_candles(symbol, timeframe, start, end)
 
             if candles:
                 self._save_candles(symbol, timeframe, candles)
+                # Retry fetching from DB after saving
                 return self.get_candles(symbol, timeframe, limit)
 
         except Exception as e:
-            # Log the error and return empty DataFrame
+            # Log the error and return an empty DataFrame
             print(f"Error fetching candles: {e}")
             return pl.DataFrame()
 
+        # Return empty DataFrame if no data was retrieved
         return pl.DataFrame()
 
     def resample_candles(self, df: pl.DataFrame, target_tf: str) -> pl.DataFrame:
