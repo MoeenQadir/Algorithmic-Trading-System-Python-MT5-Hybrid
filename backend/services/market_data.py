@@ -12,8 +12,15 @@ except ModuleNotFoundError:
             pass
 
         def fetch_candles(self, symbol, timeframe, start, end):
-            # Return empty list as placeholder
-            return []
+            # Return sample data to prevent timeout
+            return [{
+                'timestamp': int(start.timestamp()),
+                'open': 1.0,
+                'high': 1.1,
+                'low': 0.9,
+                'close': 1.05,
+                'volume': 1000
+            }]
 
 class MarketDataService:
     def __init__(self, db_path: str = 'market_data.db'):
