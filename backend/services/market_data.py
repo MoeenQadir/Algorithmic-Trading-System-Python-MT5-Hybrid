@@ -47,22 +47,31 @@ class MarketDataService:
 
     def get_candles(self, symbol: str, timeframe: str, limit: int = 1000) -> pl.DataFrame:
         # Try to get from DB first using a parameterized query
-        df = pl.read_sql(
-            "SELECT * FROM candles WHERE symbol = ? AND timeframe = ? ORDER BY timestamp DESC LIMIT ?",
-            self.db,
-            params=[symbol, timeframe, limit]
-        )
+        try:
+            df = pl.read_sql(
+                "SELECT * FROM candles WHERE symbol = ? AND timeframe = ? ORDER BY timestamp DESC LIMIT ?",
+                self.db,
+                params=[symbol, timeframe, limit]
+            )
 
-        if df.is_empty():
+            if not df.is_empty():
+                return df
+
             # Fallback to MT5 if no data
             end = datetime.now()
             start = end - timedelta(days=30)
             candles = self.mt5.fetch_candles(symbol, timeframe, start, end)
+
             if candles:
                 self._save_candles(symbol, timeframe, candles)
                 return self.get_candles(symbol, timeframe, limit)
 
-        return df
+        except Exception as e:
+            # Log the error and return empty DataFrame
+            print(f"Error fetching candles: {e}")
+            return pl.DataFrame()
+
+        return pl.DataFrame()
 
     def resample_candles(self, df: pl.DataFrame, target_tf: str) -> pl.DataFrame:
         if df.is_empty():
