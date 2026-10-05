@@ -2,7 +2,7 @@ import sqlite3
 import polars as pl
 from datetime import datetime, timedelta
 from typing import List, Dict
-from .providers.mt5_provider import MT5Provider
+from backend.providers.mt5_provider import MT5Provider
 
 class MarketDataService:
     def __init__(self, db_path: str = 'market_data.db'):
