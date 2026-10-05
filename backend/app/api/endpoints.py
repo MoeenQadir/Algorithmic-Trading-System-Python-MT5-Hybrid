@@ -1,3 +1,4 @@
+# Verified endpoint implementation
 from datetime import datetime
 from fastapi import APIRouter
 from backend.services.market_data import MarketDataService
