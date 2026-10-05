@@ -46,10 +46,11 @@ class MarketDataService:
         self.db.commit()
 
     def get_candles(self, symbol: str, timeframe: str, limit: int = 1000) -> pl.DataFrame:
-        # Try to get from DB first
+        # Try to get from DB first using a parameterized query
         df = pl.read_sql(
-            f"SELECT * FROM candles WHERE symbol = '{symbol}' AND timeframe = '{timeframe}' ORDER BY timestamp DESC LIMIT {limit}",
-            self.db
+            "SELECT * FROM candles WHERE symbol = ? AND timeframe = ? ORDER BY timestamp DESC LIMIT ?",
+            self.db,
+            params=[symbol, timeframe, limit]
         )
 
         if df.is_empty():
@@ -78,5 +79,18 @@ class MarketDataService:
         ])
 
     def _save_candles(self, symbol: str, timeframe: str, candles: List[Dict]):
-        # Implementation for saving candles to DB
-        pass
+        # Convert list of dicts to a Polars DataFrame
+        df = pl.DataFrame(candles)
+
+        # Add symbol and timeframe columns
+        df = df.with_columns([
+            pl.lit(symbol).alias("symbol"),
+            pl.lit(timeframe).alias("timeframe")
+        ])
+
+        # Insert into the database, appending to existing data
+        df.write_database(
+            table_name="candles",
+            connection=self.db,
+            if_table_exists="append"
+        )
