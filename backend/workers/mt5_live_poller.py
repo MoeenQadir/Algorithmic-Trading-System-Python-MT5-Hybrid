@@ -1,5 +1,5 @@
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 from .services.market_data import MarketDataService
 from .providers.mt5_provider import MT5Provider
 
