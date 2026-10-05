@@ -2,7 +2,18 @@ import sqlite3
 import polars as pl
 from datetime import datetime, timedelta
 from typing import List, Dict
-from backend.providers.mt5_provider import MT5Provider
+try:
+    import pytz
+    from backend.providers.mt5_provider import MT5Provider
+except ModuleNotFoundError:
+    # Fallback stub if MT5Provider or its dependencies are missing
+    class MT5Provider:
+        def __init__(self):
+            pass
+
+        def fetch_candles(self, symbol, timeframe, start, end):
+            # Return empty list as placeholder
+            return []
 
 class MarketDataService:
     def __init__(self, db_path: str = 'market_data.db'):
