@@ -1,0 +1,5 @@
+INFO:     Started server process [31664]
+INFO:     Waiting for application startup.
+2026-10-05 08:21:24 | INFO     | trading.main | database initialized (paper_trading=True live_trading=False)
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
