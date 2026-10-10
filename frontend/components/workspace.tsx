@@ -83,7 +83,7 @@ function Metric({ label, value, note, accent = "" }: { label: string; value: str
   return <div className="metric"><span className="eyebrow">{label}</span><strong className={accent}>{value}</strong>{note && <small>{note}</small>}</div>;
 }
 
-function Panel({ title, action, children, className = "" }: { title: string; action?: React.ReactNode; children: React.ReactNode; className?: string }) {
+export function Panel({ title, action, children, className = "" }: { title: string; action?: React.ReactNode; children: React.ReactNode; className?: string }) {
   return <section className={`panel ${className}`}><div className="panel-head"><h2>{title}</h2>{action}</div>{children}</section>;
 }
 
@@ -236,7 +236,7 @@ export function Workspace() {
         {activeSection === "health" && <HealthView data={data} />}
         {activeSection === "performance" && <PerformanceView data={data} closedTrades={closedTrades} />}
         {activeSection === "strategy" && <StrategyConfigView config={data.config} />}
-        {activeSection === "settings" && <SettingsView data={data} />}
+        {activeSection === "settings" && <SettingsView />}
 
         <footer className="page-footer"><span><Database size={13} /> Local-first · SQLite · cached market data</span><span><Clock3 size={13} /> No automatic order submission</span></footer>
       </div>
@@ -1110,55 +1110,6 @@ function PerformanceView({ data, closedTrades }: { data: Payload; closedTrades: 
   return <div className="stack-layout"><div className="metric-grid four"><Metric label="CLOSED TRADES" value={String(performance.total_trades || 0)} /><Metric label="WIN RATE" value={performance.win_rate == null ? "—" : `${(Number(performance.win_rate) * 100).toFixed(1)}%`} /><Metric label="PROFIT FACTOR" value={performance.profit_factor == null ? "—" : money(performance.profit_factor, 2)} /><Metric label="EXPECTANCY" value={performance.expectancy_r == null ? "—" : `${money(performance.expectancy_r, 2)}R`} /></div><Panel title="Latest backtest equity curve">{curve.length ? <MarketChart kind="equity" equity={curve} /> : <EmptyState icon={ChartNoAxesCombined} title="No equity curve yet" note="Run a backtest to create a historical equity curve." />}</Panel><Panel title="Agent performance">{agentPerformance.length ? <div className="table-wrap"><table><thead><tr><th>AGENT</th><th>PREDICTIONS</th><th>EVALUATED</th><th>ACCURACY</th><th>FALSE POS</th><th>FALSE NEG</th><th>EXPECTANCY</th><th>RELIABLE</th></tr></thead><tbody>{agentPerformance.map((a: Payload, i: number) => <tr key={i}><td>{a.agent_name}</td><td>{a.predictions}</td><td>{a.evaluated}</td><td>{a.accuracy == null ? "—" : `${(Number(a.accuracy) * 100).toFixed(1)}%`}</td><td>{a.false_positive_rate == null ? "—" : `${(Number(a.false_positive_rate) * 100).toFixed(1)}%`}</td><td>{a.false_negative_rate == null ? "—" : `${(Number(a.false_negative_rate) * 100).toFixed(1)}%`}</td><td>{a.historical_expectancy_r == null ? "—" : `${money(a.historical_expectancy_r, 2)}R`}</td><td>{a.sample_reliable ? "✓" : "✗"}</td></tr>)}</tbody></table></div> : <EmptyState icon={Bot} title="No agent performance data" note="Run analysis cycles to evaluate agent predictions against outcomes." />}</Panel><Panel title="Recent closed trades"><TradesView rows={closedTrades.slice(0, 8)} /></Panel></div>;
 }
 
-function SettingsView({ data }: { data: Payload }) {
-  const config = data.config || {};
-  const health = data.status || {};
-  const providerRows = Object.entries(health.providers || {}) as [string, Payload][];
-  const components = Object.entries(health.component_health || {}) as [string, Payload][];
-  return (
-    <div className="settings-grid">
-      <Panel title="Runtime mode">
-        <div className="settings-list">
-          <Setting label="Execution" value={config.paper_trading ? "Paper trading" : "Disabled"} />
-          <Setting label="Live trading" value={config.live_trading ? "Enabled" : "Disabled"} />
-          <Setting label="Default market" value={`${config.default_symbol || "—"} · ${config.default_timeframe || "—"}`} />
-          <Setting label="Market data provider" value={config.market_data_provider || "—"} />
-          <Setting label="AI model" value={config.llm?.model || "—"} />
-          <Setting label="AI provider" value={config.llm?.configured ? "Configured" : "AI PROVIDER NOT CONFIGURED"} />
-        </div>
-      </Panel>
-      <Panel title="Risk limits">
-        <div className="settings-list">
-          {Object.entries(config.risk || {}).map(([key, value]) => (
-            <Setting key={key} label={key.replaceAll("_", " ")} value={typeof value === "number" && value < 1 ? `${(value * 100).toFixed(2)}%` : String(value)} />
-          ))}
-        </div>
-      </Panel>
-      <Panel title="Provider health">
-        <div className="settings-list">
-          <Setting label="Backend API" value={data.health?.status || "OFFLINE"} />
-          {providerRows.map(([key, value]) => (
-            <Setting key={key} label={key.replaceAll("_", " ")} value={`${value.status || "OK"}${value.rate_limited ? " · RATE LIMITED" : ""}`} />
-          ))}
-          {components.map(([key, value]) => (
-            <Setting key={`component-${key}`} label={key.replaceAll("_", " ")} value={`${value.status}${value.message ? ` · ${value.message}` : ""}`} />
-          ))}
-        </div>
-      </Panel>
-      <Panel title="Decision weights">
-        <div className="settings-list">
-          {Object.entries(config.agent_weights || {}).map(([key, value]) => (
-            <Setting key={key} label={key.replaceAll("_", " ")} value={String(value)} />
-          ))}
-        </div>
-      </Panel>
-    </div>
-  );
-}
-
-function Setting({ label, value }: { label: string; value: string }) {
-  return <div className="setting-row"><span>{label}</span><strong>{value}</strong></div>;
-}
 
 function DecisionTable({ rows }: { rows: Payload[] }) {
   return <div className="table-wrap"><table><thead><tr><th>TIME</th><th>SYMBOL</th><th>ACTION</th><th>DIRECTION</th><th>CONFIDENCE</th><th>REASON</th></tr></thead><tbody>{rows.map((row) => <tr key={row.id}><td>{stamp(row.created_at)}</td><td>{row.symbol}</td><td><Direction value={row.action} /></td><td>{row.direction}</td><td>{Math.round(Number(row.confidence || 0) * 100)}%</td><td className="reason-cell">{row.decision_reason || "—"}</td></tr>)}</tbody></table>{!rows.length && <p className="empty-inline">No stored decisions.</p>}</div>;

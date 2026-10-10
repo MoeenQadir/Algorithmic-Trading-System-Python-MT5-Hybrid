@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { Panel, Metric } from "./workspace";
+import { Panel } from "./workspace";
 import { apiGet, apiPost } from "@/lib/api";
-import { ShieldCheck, SlidersHorizontal, Save, RefreshCw } from "lucide-react";
+import { ShieldCheck, Save, RefreshCw } from "lucide-react";
 
 interface Settings {
   max_risk_per_trade: number;
@@ -56,8 +56,8 @@ export function SettingsView() {
     async function loadSettings() {
       try {
         const [current, defaults] = await Promise.all([
-          apiGet("/api/settings"),
-          apiGet("/api/settings/defaults"),
+          apiGet<Settings>("/api/settings"),
+          apiGet<Settings>("/api/settings/defaults"),
         ]);
         setSettings({ ...defaults, ...current });
       } catch (error) {

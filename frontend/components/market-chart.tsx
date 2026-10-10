@@ -57,7 +57,7 @@ function calculateSMA(data: number[], period: number): number[] {
   return result;
 }
 
-function calculateVWAP(candles: CandlePoint[]): number[] {
+function calculateVWAP(candles: { high: number; low: number; close: number; volume?: number }[]): number[] {
   const result: number[] = [];
   let cumulativeVolume = 0;
   let cumulativePV = 0;
@@ -147,6 +147,7 @@ const uniqueEquity = equity
            high: candle.high,
            low: candle.low,
            close: candle.close,
+           volume: candle.volume,
          }))
          .sort((a, b) => a.time - b.time)
          .filter((candle, index, array) => 

@@ -1,11 +1,20 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { apiGet, apiPost, apiDelete } from '@/lib/api';
 
+interface InventoryItem {
+  symbol: string;
+  timeframe: string;
+  total_candles: number;
+  earliest_timestamp: string | null;
+  latest_timestamp: string | null;
+  status: string;
+  age_minutes: number | null;
+}
+
 export default function DataManager() {
-  const [inventory, setInventory] = useState<Array<any>>([]);
+  const [inventory, setInventory] = useState<InventoryItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [downloadSymbol, setDownloadSymbol] = useState<string>('XAUUSD');
@@ -15,10 +24,8 @@ export default function DataManager() {
   const [isDownloading, setIsDownloading] = useState<boolean>(false);
   const [downloadProgress, setDownloadProgress] = useState<number>(0);
   const [downloadMessage, setDownloadMessage] = useState<string>('');
-  const [deleteMessage, setDeleteMessage] = useState<string>('');
+  const [, setDeleteMessage] = useState<string>('');
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
-
-  const router = useRouter();
 
   useEffect(() => {
     fetchInventory();
@@ -53,7 +60,7 @@ export default function DataManager() {
     setLoading(true);
     setError(null);
     try {
-      const data = await apiGet<{ data: Array<any> }>('/data/inventory');
+      const data = await apiGet<{ data: InventoryItem[] }>('/data/inventory');
       setInventory(data.data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
@@ -225,7 +232,7 @@ export default function DataManager() {
                    ))}
                   {inventory.length === 0 && (
                     <tr>
-                      <td className="px-6 py-4 text-center text-gray-500" colSpan="7">
+                      <td className="px-6 py-4 text-center text-gray-500" colSpan={8}>
                         No data available. Use the downloader below to fetch data.
                       </td>
                     </tr>
