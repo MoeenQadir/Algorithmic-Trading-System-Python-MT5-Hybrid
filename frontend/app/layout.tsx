@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Trading Framework | Research Console",
-  description: "Local-first trading research and paper-trading dashboard.",
+  title: "Hi-Tech (Trading System) | Research Console",
+  description: "Hi-Tech (Trading System) — local-first trading research and paper-trading dashboard by Hi-Tech.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

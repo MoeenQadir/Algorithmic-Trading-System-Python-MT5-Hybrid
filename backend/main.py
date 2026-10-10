@@ -29,8 +29,8 @@ settings = get_settings()
 pipeline = TradingPipeline()
 
 app = FastAPI(
-    title="Multi-Agent Trading System",
-    description="Local-first multi-agent trading research and paper-trading platform",
+    title="Hi-Tech (Trading System)",
+    description="Hi-Tech (Trading System) — local-first multi-agent trading research and paper-trading platform by Hi-Tech (CEO: Moeen Ul Qadir)",
     version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc",

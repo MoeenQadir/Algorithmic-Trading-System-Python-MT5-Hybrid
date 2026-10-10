@@ -177,12 +177,12 @@ export function Workspace() {
 
   return <div className="shell">
     <aside className="sidebar">
-      <Link href="/dashboard" className="brand"><span className="brand-mark"><ChartNoAxesCombined size={19} /></span><span>FIELDNOTE<small>TRADING SYSTEMS</small></span></Link>
+      <Link href="/dashboard" className="brand"><span className="brand-mark"><ChartNoAxesCombined size={19} /></span><span>HI-TECH<small>TRADING SYSTEMS</small></span></Link>
       <div className="side-label">WORKSPACE</div>
       <nav>{nav.map(({ href, label, icon: Icon }) => <Link key={href} href={`/${href}`} className={`nav-link ${activeSection === href ? "active" : ""}`}><Icon size={17} strokeWidth={1.8} /><span>{label}</span>{href === "positions" && openPositions.length > 0 && <b>{openPositions.length}</b>}</Link>)}</nav>
       <div className="sidebar-spacer" />
       <div className="mode-box"><span className="mode-indicator" /><div><strong>Paper environment</strong><small>Real-money routing disabled</small></div></div>
-      <div className="side-foot">LOCAL RESEARCH BUILD <span>v1.0</span></div>
+      <div className="side-foot">HI-TECH · MOEEN UL QADIR, CEO <span>v1.0</span></div>
     </aside>
 
     <main className="main-area">

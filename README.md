@@ -1,6 +1,6 @@
-# Trading Framework
+# Hi-Tech (Trading System)
 
-A local-first research and paper-trading modular monolith. The default is SQLite, local/sample data, deterministic analysis, and paper execution. It does not route live orders. This project is for research and education; it does not promise profitability.
+A local-first research and paper-trading modular monolith by **Hi-Tech** — founded and led by **Moeen Ul Qadir (CEO)**. The default is SQLite, local/sample data, deterministic analysis, and paper execution. It does not route live orders. This project is for research and education; it does not promise profitability.
 
 ## Architecture
 

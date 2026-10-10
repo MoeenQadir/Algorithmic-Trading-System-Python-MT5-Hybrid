@@ -46,7 +46,7 @@
 - No more "Method Not Allowed" or "name 'datetime' is not defined" errors.
 
 ## Current State
-The Trading Framework now:
+The Hi-Tech (Trading System) now:
 - Dynamically handles any symbol/timeframe combination (no hardcoded values).
 - Provides live data persistence and automatic resampling from 1m data.
 - Allows users to download historical data for any symbol/timeframe/date range (using chunking for large ranges).
